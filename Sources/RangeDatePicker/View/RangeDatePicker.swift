@@ -3,7 +3,7 @@
 
 import SwiftUI
 
-struct RangeDatePicker: View {
+public struct RangeDatePicker: View {
     @Environment(\.calendar) var calendar
     
     let title: LocalizedStringKey
@@ -13,7 +13,12 @@ struct RangeDatePicker: View {
         Binding(get: { dates }, set: dateBindingSetter)
     }
     
-    var body: some View {
+    public init(title: LocalizedStringKey, dates: Binding<Set<DateComponents>>) {
+        self.title = title
+        self._dates = dates
+    }
+    
+    public var body: some View {
         MultiDatePicker(title, selection: datesBinding)
     }
     

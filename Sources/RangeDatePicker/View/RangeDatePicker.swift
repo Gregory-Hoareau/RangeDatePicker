@@ -5,7 +5,6 @@ import SwiftUI
 
 struct RangeDatePicker: View {
     @Environment(\.calendar) var calendar
-    private let datePickerComponents: Set<Calendar.Component> = [.calendar, .era, .year, .month, .day]
     
     let title: LocalizedStringKey
     @Binding var dates: Set<DateComponents>
@@ -27,7 +26,7 @@ struct RangeDatePicker: View {
                 dates = newValue
             case 2:
                 // Second tap : A different date is selected, we fill the range between the two dates
-                dates = filledDatesRange(between: newValue)
+                dates = RangeDateHelper.filledDatesRange(between: newValue, calendar: calendar)
             default:
                 // We keep the last date selected as the anchor
                 dates = [addedDate]
@@ -43,24 +42,5 @@ struct RangeDatePicker: View {
         }
         
         dates = []
-    }
-    
-    private func filledDatesRange(between selectedDates: Set<DateComponents>) -> Set<DateComponents> {
-        let sortedDates = selectedDates.compactMap { calendar.date(from: $0) }.sorted()
-        var datesToAdd: [DateComponents] = []
-        
-        if let startDate = sortedDates.first, let endDate = sortedDates.last {
-            var currentDate = startDate
-            while currentDate < endDate {
-                if let nextDate = calendar.date(byAdding: .day, value: 1, to: currentDate) {
-                    if !sortedDates.contains(nextDate) {
-                        datesToAdd.append(calendar.dateComponents(datePickerComponents, from: nextDate))
-                    }
-                    currentDate = nextDate
-                }
-            }
-        }
-        
-        return selectedDates.union(datesToAdd)
     }
 }

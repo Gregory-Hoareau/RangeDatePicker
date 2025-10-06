@@ -10,7 +10,33 @@ public struct RangeDatePicker: View {
     @Binding var dates: Set<DateComponents>
     
     var datesBinding: Binding<Set<DateComponents>> {
-        Binding(get: { dates }, set: dateBindingSetter)
+        Binding {
+            dates
+        } set: { newValue in
+            if let addedDate = newValue.subtracting(dates).first {
+                switch newValue.count {
+                case 1:
+                    // First tap : only one date is selected, we use it as our anchor
+                    dates = newValue
+                case 2:
+                    // Second tap : A different date is selected, we fill the range between the two dates
+                    dates = RangeDateHelper.filledDatesRange(between: newValue, calendar: calendar)
+                default:
+                    // We keep the last date selected as the anchor
+                    dates = [addedDate]
+                }
+                return
+            }
+            
+            // Unselecting a date
+            if dates.count > 1, let removedDate = dates.subtracting(newValue).first {
+                // Keep the unselected date as the new anchor for the range
+                dates = [removedDate]
+                return
+            }
+            
+            dates = []
+        }
     }
     
     public init(_ title: LocalizedStringKey = "", dates: Binding<Set<DateComponents>>) {
@@ -20,32 +46,5 @@ public struct RangeDatePicker: View {
     
     public var body: some View {
         MultiDatePicker(title, selection: datesBinding)
-    }
-    
-    private func dateBindingSetter(_ newValue: Set<DateComponents>) {
-        // Selecting a date
-        if let addedDate = newValue.subtracting(dates).first {
-            switch newValue.count {
-            case 1:
-                // First tap : only one date is selected, we use it as our anchor
-                dates = newValue
-            case 2:
-                // Second tap : A different date is selected, we fill the range between the two dates
-                dates = RangeDateHelper.filledDatesRange(between: newValue, calendar: calendar)
-            default:
-                // We keep the last date selected as the anchor
-                dates = [addedDate]
-            }
-            return
-        }
-        
-        // Unselecting a date
-        if dates.count > 1, let removedDate = dates.subtracting(newValue).first {
-            // Keep the unselected date as the new anchor for the range
-            dates = [removedDate]
-            return
-        }
-        
-        dates = []
     }
 }

@@ -8,6 +8,7 @@ public struct RangeDatePicker: View {
     
     let title: LocalizedStringKey
     @Binding var dates: Set<DateComponents>
+    let bounds: Range<Date>
     
     var datesBinding: Binding<Set<DateComponents>> {
         Binding {
@@ -42,9 +43,22 @@ public struct RangeDatePicker: View {
     public init(_ title: LocalizedStringKey = "", dates: Binding<Set<DateComponents>>) {
         self.title = title
         self._dates = dates
+        self.bounds = Date.distantPast..<Date.distantFuture
+    }
+    
+    public init(_ title: LocalizedStringKey = "", dates: Binding<Set<DateComponents>>, in bounds: Range<Date>) {
+        self.title = title
+        self._dates = dates
+        self.bounds = bounds
+    }
+    
+    public init(_ title: LocalizedStringKey = "", dates: Binding<Set<DateComponents>>, startDate: Date = .distantPast, endDate: Date = .distantFuture) {
+        self.title = title
+        self._dates = dates
+        self.bounds = startDate..<endDate
     }
     
     public var body: some View {
-        MultiDatePicker(title, selection: datesBinding)
+        MultiDatePicker(title, selection: datesBinding, in: bounds)
     }
 }

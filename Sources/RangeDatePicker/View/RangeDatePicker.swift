@@ -13,7 +13,7 @@ public struct RangeDatePicker: View {
         Binding(get: { dates }, set: dateBindingSetter)
     }
     
-    public init(title: LocalizedStringKey, dates: Binding<Set<DateComponents>>) {
+    public init(_ title: LocalizedStringKey = "", dates: Binding<Set<DateComponents>>) {
         self.title = title
         self._dates = dates
     }
